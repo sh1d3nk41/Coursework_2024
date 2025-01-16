@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inverted Index Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Inverted Index Search</h1>
+
+<form id="searchForm">
+    <label for="query">Search:</label>
+    <input type="text" id="query" name="query" placeholder="Enter a word" required>
+    <!-- type="button", чтобы не перезагружать страницу -->
+    <button type="button" id="submitButton">Searфch</button>
+</form>
+
+<div id="results"></div>
+
+<hr>
+
+<!-- Форма для загрузки файла -->
+<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/upload">
+    <label for="file">Upload File:</label>
+    <input type="file" id="file" name="file" required>
+    <button type="submit">Upload</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const submitButton = document.getElementById('submitButton');
+        const resultsDiv = document.getElementById('results');
+
+        // Обработка клика на кнопку "Search"
+        submitButton.addEventListener('click', async () => {
+            console.log("Search button clicked");
+            const queryValue = document.getElementById('query').value;
+
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    // Отправляем JSON с параметром query
+                    body: JSON.stringify({ query: queryValue })
+                });
+
+                if (!response.ok) {
+                    // Ошибка на сервере
+                    const errorText = await response.text();
+                    resultsDiv.textContent = `Error: ${errorText}`;
+                } else {
+                    // Попытка прочесть JSON-ответ
+                    const jsonData = await response.json();
+                    resultsDiv.textContent = jsonData.result ?? jsonData.error;
+                }
+            } catch (err) {
+                // Если сам fetch упал (нет связи с сервером и т.п.)
+                resultsDiv.textContent = `Fetch error: ${err.message}`;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
