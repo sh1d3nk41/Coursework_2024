@@ -9,11 +9,11 @@ import java.util.Set;
 public class RequestHandler implements Runnable {
 
     private final Socket socket;
-    private final InvertedIndex invertedIndex; // Поле для индекса
+    private final InvertedIndex invertedIndex;
 
     public RequestHandler(Socket socket, InvertedIndex invertedIndex) {
         this.socket = socket;
-        this.invertedIndex = invertedIndex; // Сохраняем индекс
+        this.invertedIndex = invertedIndex;
     }
 
     @Override
@@ -34,7 +34,6 @@ public class RequestHandler implements Runnable {
             String method = parts[0];
             String path = parts[1];
 
-            // Читаем заголовки (чтобы узнать Content-Length, если есть)
             int contentLength = 0;
             String contentType = null;
             String line;
@@ -47,16 +46,12 @@ public class RequestHandler implements Runnable {
             }
 
             if (method.equalsIgnoreCase("GET") && path.equals("/")) {
-                // Отдать index.html
                 handleGetRoot(out);
             } else if (method.equalsIgnoreCase("POST") && path.equals("/")) {
-                // Поиск
                 handlePostRoot(in, out, contentType, contentLength);
             } else if (method.equalsIgnoreCase("POST") && path.equals("/add")) {
-                // Добавление файла и обновление индекса
                 handlePostAdd(in, out, contentType, contentLength);
             } else {
-                // Иной путь/метод
                 sendErrorResponse(out, "Not found or not supported: " + method + " " + path);
             }
 
@@ -171,14 +166,12 @@ public class RequestHandler implements Runnable {
             writer.write(content); // Сохраняем содержимое файла
         }
 
-        // Добавляем слова из файла в индекс
         for (String word : content.split("\\W+")) {
             if (!word.isEmpty()) {
                 invertedIndex.add(word.toLowerCase(), filename);
             }
         }
 
-        // Возвращаем успешный ответ
         JSONObject response = new JSONObject();
         response.put("message", "File '" + filename + "' added to resources and index updated.");
 
@@ -195,15 +188,13 @@ public class RequestHandler implements Runnable {
 
 
     private void sendSearchResponse(OutputStream out, String query) throws IOException {
-        // Обрабатываем запрос с поддержкой кириллицы
-        query = query.toLowerCase(); // Приводим к нижнему регистру для согласованности
+        query = query.toLowerCase();
         Set<String> results = invertedIndex.search(query);
 
         String resultMessage;
         if (results.isEmpty()) {
             resultMessage = "No results found for: " + query;
         } else {
-            // Разделяем файлы новой строкой
             resultMessage = "Results for '" + query + "':\n" + String.join("\n", results);
         }
 

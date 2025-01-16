@@ -12,11 +12,6 @@ public class FileProcessor {
         this.threadPool = threadPool;
     }
 
-    /**
-     * Обрабатывает все файлы в указанной директории.
-     *
-     * @param directory Директория с текстовыми файлами.
-     */
     public void processFiles(File directory) {
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".txt"));
         if (files == null) return;
@@ -26,11 +21,6 @@ public class FileProcessor {
         }
     }
 
-    /**
-     * Обрабатывает один файл и добавляет слова в индекс.
-     *
-     * @param file Файл для обработки.
-     */
     private void processFile(File file) {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;

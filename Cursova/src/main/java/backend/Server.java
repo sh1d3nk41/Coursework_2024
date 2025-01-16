@@ -31,8 +31,8 @@ public class Server {
 
     public static void main(String[] args) {
         int port = 8081;
-        InvertedIndex invertedIndex = new InvertedIndex(); // Ініціалізація індексу
-        ThreadPool threadPool = new ThreadPool(10); // Ініціалізація пулу потоків
+        InvertedIndex invertedIndex = new InvertedIndex();
+        ThreadPool threadPool = new ThreadPool(10);
         Server server = new Server(port, invertedIndex, threadPool);
         server.start();
     }
